@@ -1,0 +1,2 @@
+sample-export
+curl --header 'X-Auth-Token: d331ba7e-9ab4-4561-b74a-6be6ac98d9ed' -X GET 'https://shab.ch/api/v1/publications/csv?includeContent=true&includePDF=false&pageRequest.page=0&pageRequest.size=3000&publicationStates=PUBLISHED&publicationStates=CANCELLED' | sed -E 's#^"([^"]+)".*#\1#'
