@@ -1,0 +1,28 @@
+{
+  "id": null,
+  "title": "CPU Usage",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "CPU Usage Over Time",
+      "targets": [
+        {
+		  "query": "from(bucket: \"officialgazette\")\r\n  |> range(start: -24h)\r\n  |> filter(fn: (r) => r._measurement == \"cpu\")",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "InfluxDB"
+          }
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "schemaVersion": 30,
+  "version": 1
+}
