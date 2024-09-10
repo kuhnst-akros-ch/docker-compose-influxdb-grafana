@@ -31,3 +31,28 @@ curl --request POST "$INFLUX_HOST/api/v2/dashboards?orgID=$ORGID" \
   --header "Authorization: Token $TOKEN" \
   -H "Content-Type: application/json" \
   --data-binary "@$SCRIPT_DIR/my_dashboard.json"
+  --data '{
+    "name": "My New Dashboard",
+    "description": "This dashboard was created via the API",
+    "orgID": "851b746f2f93a4b5",
+    "cells": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 4,
+        "view": {
+          "name": "Graph",
+          "type": "xy",
+          "properties": {
+            "queries": [
+              {
+                "text": "from(bucket: \"my-bucket\") |> range(start: -1h) |> filter(fn: (r) => r[\"_measurement\"] == \"my_measurement\")",
+                "editMode": "advanced"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }'
