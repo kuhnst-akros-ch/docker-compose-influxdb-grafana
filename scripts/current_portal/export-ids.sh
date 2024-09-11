@@ -44,6 +44,7 @@ fetch_data() {
 		\ #-o ids/$date.csv \
 		-X GET \
 		"$url" \
+	| tee "$SCRIPT_DIR/ids/$date.xml" \
 	| extract_ids_from_xml $date -
 }
 
