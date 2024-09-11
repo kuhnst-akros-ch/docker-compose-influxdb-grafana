@@ -6,20 +6,32 @@ from collections.abc import MutableMapping
 def flatten_json(nested_json):
 	"""
 	Flattens a nested JSON object, keeping only the immediate key (ignoring the path).
+	If an array (list) is encountered, only the first item is processed.
 	"""
 	items = {}
+
 	for key, value in nested_json.items():
 		if isinstance(value, MutableMapping):
 			# Recursively flatten dictionaries
 			flat_dict = flatten_json(value)
 			for inner_key, inner_value in flat_dict.items():
-				# If key already exists, skip or overwrite (you can choose behavior here)
-				if inner_key not in items:  # Skip duplicates
+				# Skip duplicates
+				if inner_key not in items:
 					items[inner_key] = inner_value
+		elif isinstance(value, list) and value:
+			# Process only the first item in the list
+			if isinstance(value[0], MutableMapping):
+				flat_dict = flatten_json(value[0])
+				for inner_key, inner_value in flat_dict.items():
+					if inner_key not in items:
+						items[inner_key] = inner_value
+			else:
+				items[key] = value[0]
 		else:
 			# Add key directly, skip if duplicate
 			if key not in items:
 				items[key] = value
+
 	return items
 
 def sanitize_value(value):

@@ -1,9 +1,15 @@
-import os
 import xmltodict
 import json
 import argparse
 import sys
 from pathlib import Path
+import argparse
+import json
+import sys
+from pathlib import Path
+
+import xmltodict
+
 
 def main():
     # Create argument parser
