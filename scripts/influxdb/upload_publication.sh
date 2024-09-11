@@ -13,7 +13,7 @@ PUBLICATION_DATE="$(echo "$JSON" | python $SCRIPT_DIR/get-field-from-json.py "pu
 PUBLICATION_DATE=$(date -d "$PUBLICATION_DATE" +%s)
 
 LINE="$(echo "$JSON" | python $SCRIPT_DIR/json2line.py)"
-LINE="publication,$LINE value=$PUBLICATION_DATE $PUBLICATION_DATE"
+LINE="publication,$LINE value=1 $PUBLICATION_DATE"
 
 #echo "LINE="
 #echo "$LINE"
