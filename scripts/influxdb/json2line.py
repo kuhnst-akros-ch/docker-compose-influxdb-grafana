@@ -3,74 +3,72 @@ import argparse
 import sys
 from collections.abc import MutableMapping
 
-def flatten_json(nested_json, parent_key='', sep='_'):
+def flatten_json(nested_json):
 	"""
-	Flattens a nested JSON object.
+	Flattens a nested JSON object, keeping only the immediate key (ignoring the path).
 	"""
-	items = []
+	items = {}
 	for key, value in nested_json.items():
-		new_key = f"{parent_key}{sep}{key}" if parent_key else key
 		if isinstance(value, MutableMapping):
-			items.extend(flatten_json(value, new_key, sep=sep).items())
+			# Recursively flatten dictionaries
+			flat_dict = flatten_json(value)
+			for inner_key, inner_value in flat_dict.items():
+				# If key already exists, skip or overwrite (you can choose behavior here)
+				if inner_key not in items:  # Skip duplicates
+					items[inner_key] = inner_value
 		else:
-			items.append((new_key, value))
-	return dict(items)
+			# Add key directly, skip if duplicate
+			if key not in items:
+				items[key] = value
+	return items
 
 def sanitize_value(value):
 	"""
-	Escapes special characters like commas and spaces in field values to prevent issues with line protocol.
+	Wraps string values in double quotes.
+	Booleans and numbers are not quoted.
+	Escapes special characters for InfluxDB line protocol.
 	"""
 	if isinstance(value, str):
-		value = value.replace(',', '\\,').replace(' ', '\\ ')
-	return value
+		# Escape special characters for InfluxDB line protocol
+		value = value.replace(',', '\,').replace(' ', '\ ')
+		return f'"{value}"'
+	elif isinstance(value, bool):
+		return 'true' if value else 'false'
+	else:
+		return str(value)
 
 def classify_keys(flattened_json):
 	"""
-	Classifies all key-value pairs into tags, fields, and selects the first key as a measurement.
+	Classifies all key-value pairs into tags, fields.
+	No special treatment for the first key-value pair.
 	"""
 	tags = {}
 	fields = {}
 
-	# Dynamically select the first key to be the measurement (we don't assume any key name)
-	measurement_key, measurement_value = None, None
-
 	# Iterate through all key-value pairs and classify them
 	for key, value in flattened_json.items():
-		if measurement_key is None:
-			measurement_key = key
-			measurement_value = value
-			continue
-
 		# Classify based on value type: assume strings and booleans are tags, numbers are fields
 		if isinstance(value, (str, bool)):
 			tags[key] = value
 		elif isinstance(value, (int, float)):
 			fields[key] = value
 		else:
-			# You can handle other types here as necessary
+			# Handle other types by converting them to strings
 			fields[key] = sanitize_value(str(value))
 
-	return measurement_key, measurement_value, tags, fields
+	return tags, fields
 
 def json_to_line_protocol(data):
 	"""
-	Convert JSON data to InfluxDB line protocol dynamically.
+	Convert JSON data to a format with key=value pairs, with values wrapped in double quotes where necessary.
+	The output consists only of key-value pairs separated by commas, with no measurement.
 	"""
 	flattened_data = flatten_json(data)
 
-	# Classify the flattened data into measurement, tags, and fields
-	measurement_key, measurement_value, tags, fields = classify_keys(flattened_data)
+	# Sanitize and construct key-value pairs
+	kv_str = ','.join([f"{key}={sanitize_value(value)}" for key, value in flattened_data.items()])
 
-	# Construct tags part
-	tag_str = ','.join([f"{key}={sanitize_value(str(value))}" for key, value in tags.items()])
-
-	# Sanitize and construct fields part
-	field_str = ','.join([f"{key}={sanitize_value(value)}" for key, value in fields.items()])
-
-	# Build line protocol with measurement (no timestamp assumed)
-	line_protocol = f"{measurement_key},{tag_str} {field_str}"
-
-	return line_protocol
+	return kv_str
 
 def read_json_from_file(file_path):
 	"""Reads JSON data from a file."""
@@ -102,7 +100,7 @@ def main():
 		print("Error: No input provided. Provide a file or use pipe input.")
 		sys.exit(1)
 
-	# Convert JSON to line protocol
+	# Convert JSON to line protocol, using 'data' as a generic measurement
 	line_protocol = json_to_line_protocol(json_data)
 
 	# Print the line protocol output

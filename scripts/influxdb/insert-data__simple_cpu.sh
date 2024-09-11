@@ -18,11 +18,13 @@ VALUE="0.$RANDOM"
 # Timestamp (Unix time)
 TIMESTAMP=$(date +%s)
 
-echo "data-raw=$MEASUREMENT,host=$HOST,region=$REGION value=$VALUE $TIMESTAMP"
+echo "$MEASUREMENT,host=$HOST,region=$REGION value=$VALUE $TIMESTAMP"
+
+DATA="$MEASUREMENT,host=$HOST,region=$REGION value=$VALUE $TIMESTAMP"
 
 # Insert data into InfluxDB
 # curl -i -XPOST "$INFLUX_HOST/api/v2/write?orgID=708866f55854f41b&bucket=$BUCKET&precision=$PRECISION" \
 curl -i -XPOST "$INFLUX_HOST/api/v2/write?org=$ORG&bucket=$BUCKET&precision=$PRECISION" \
   --header "Authorization: Token $TOKEN" \
-  --data-raw "$MEASUREMENT,host=$HOST,region=$REGION value=$VALUE $TIMESTAMP"
+  --data-raw "$DATA"
 
