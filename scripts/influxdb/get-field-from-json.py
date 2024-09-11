@@ -50,9 +50,10 @@ def main():
 
     if field_value is not None:
         # Print the value of the field
-        print(f'The value of "{args.field_name}" is: {field_value}')
+        print(f'{field_value}')
     else:
         print(f'Field "{args.field_name}" not found in the JSON data.')
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
