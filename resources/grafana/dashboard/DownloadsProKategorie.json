@@ -1,0 +1,131 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 5,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "default": true,
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "normal",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-09-01)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> filter(fn: (r) => strings.containsStr(v: r.displayName, substr: \"das Handelsregister\"))\r\n  |> map(fn: (r) => ({\r\n      r with subRubric: if r.subRubric == \"\\\"HR01\\\"\" then \"CSV\" \r\n                  else if r.subRubric == \"\\\"HR02\\\"\" then \"XML\"\r\n                  else if r.subRubric == \"\\\"HR03\\\"\" then \"Word\"\r\n                  else r.subRubric\r\n    }))\r\n  |> keep(columns: [\"subRubric\", \"_time\", \"_value\"]) \r\n  |> group(columns: [\"subRubric\"])\r\n  |> aggregateWindow(every: 1d, fn: count, createEmpty: true) ",
+          "refId": "A"
+        }
+      ],
+      "title": "Downloads pro Kategorie",
+      "type": "barchart"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "2024-07-31T22:00:00.000Z",
+    "to": "2024-08-31T22:00:00.000Z"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Downloads pro Kategorie",
+  "uid": "edxns2saqxiwwf",
+  "version": 12,
+  "weekStart": ""
+}
