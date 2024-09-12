@@ -16,7 +16,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 mkdir -p "$SCRIPT_DIR/ids"
 
 # Start date is today
-START_DATE=$(date +%Y-%m-%d)
+# START_DATE=$(date +%Y-%m-%d)
+START_DATE='2024-09-01'
 
 # Function to extract ids
 extract_ids_from_xml() {
@@ -40,7 +41,7 @@ fetch_data() {
 	# echo "url=$url"
 	curl \
 		--silent \
-		--header "X-Auth-Token: $TOKEN" \
+		\ #--header "X-Auth-Token: $TOKEN" \
 		\ #-o ids/$date.csv \
 		-X GET \
 		"$url" \

@@ -17,7 +17,7 @@ mkdir -p "$SCRIPT_DIR/publications"
 
 # Start date is today
 START_DATE=$(date +%Y-%m-%d)
-MAX_DOWNLOAD=10000
+MAX_DOWNLOAD=100000
 
 # Function to make the curl request
 fetch_data() {
@@ -27,7 +27,7 @@ fetch_data() {
 	printf "url is $url \n\n" 1>&2
 	curl \
 		--silent \
-		--header "X-Auth-Token: $TOKEN" \
+		\ #--header "X-Auth-Token: $TOKEN" \
 		\ # -o "$SCRIPT_DIR/publications/$id.xml" \
 		-X GET \
 		"$url" \
@@ -46,7 +46,7 @@ for file in $SCRIPT_DIR/ids/*.ids; do
 			echo "File already present: $SCRIPT_DIR/publications/$id.xml"
 		fi
 		
-		if [ ! -f "$SCRIPT_DIR/publications/$id.xml" ]; then
+		if [ ! -f "$SCRIPT_DIR/publications/$id.xml" ] && [ ! -f "$SCRIPT_DIR/publications_processed/$id.xml" ]; then
 			printf "$file: Processing id: $id \n\n"
 			fetch_data $id
 
