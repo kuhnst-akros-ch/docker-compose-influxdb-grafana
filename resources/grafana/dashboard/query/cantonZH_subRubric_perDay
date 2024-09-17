@@ -1,7 +1,0 @@
-from(bucket: "officialgazette")
-  |> range(start: 2024-06-24, stop: 2024-07-10)
-  |> filter(fn: (r) => r._measurement == "publication")
-  |> filter(fn: (r) => r.cantons == "\"ZH\"")
-  |> group(columns: ["subRubric"])
-  |> aggregateWindow(every: 1d, fn: count)
-  |> yield(name: "subRubric count per day")
