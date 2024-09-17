@@ -22,6 +22,8 @@ LINE="publication,$LINE value=1 $PUBLICATION_DATE"
 #
 #echo "$LINE" > $SCRIPT_DIR/line.out
 
-echo "$LINE" | $SCRIPT_DIR/insert-line.sh
+# echo "$LINE" | $SCRIPT_DIR/insert-line.sh
 
 # printf "Data from $FILE uploaded as:\n$LINE\n"
+
+echo "$LINE" >> "$SCRIPT_DIR"/lines/all_lines.txt
