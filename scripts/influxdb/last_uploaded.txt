@@ -1,0 +1,1 @@
+/c/development/github/kuhnst-akros-ch/docker-compose-influxdb-grafana/scripts/influxdb/../current_portal/publications/ZH/c017f9dc-957d-49ec-bff0-ccb2da4ddcc1.xml
