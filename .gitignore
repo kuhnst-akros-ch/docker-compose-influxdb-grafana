@@ -1,8 +1,4 @@
-scripts/current_portal/ids
-scripts/current_portal/publications
-scripts/current_portal/split-ids
 .idea/
 *.iml
-/scripts/current_portal/ids_old
-scripts/current_portal/publications_processed
-scripts/influxdb/lines
+/lines/
+**/all_lines.txt
