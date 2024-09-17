@@ -1,0 +1,190 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 7,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "default": true,
+        "type": "influxdb",
+        "uid": "P951FEA4DE68E13C5"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "log": 2,
+              "type": "log"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P951FEA4DE68E13C5"
+          },
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      displayName: strings.replaceAll(v: r.displayName, t: \",\", u: \"\"),  // Remove commas\r\n      subRubric: strings.replaceAll(v: r.subRubric, t: \",\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      displayName: strings.replaceAll(v: r.displayName, t: \"\\\"\", u: \"\"),  // Remove double quotes\r\n      subRubric: strings.replaceAll(v: r.subRubric, t: \"\\\"\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> filter(fn: (r) => contains(value: r.displayName, set: strings.split(v: \"${displayName:csv}\", t: \",\")))\r\n  |> filter(fn: (r) => contains(value: r.subRubric, set: strings.split(v: \"${subRubric:csv}\", t: \",\")))\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      combinedLabel: r.displayName + \" - \" + r.subRubric\r\n  }))\r\n  |> keep(columns: [\"combinedLabel\", \"_time\", \"_value\"]) \r\n  |> group(columns: [\"combinedLabel\"])\r\n  |> aggregateWindow(every: 1d, fn: count, createEmpty: false)\r\n  |> yield(name: \"combinedLabel count per day\")",
+          "refId": "A"
+        }
+      ],
+      "title": "Meldungen pro Erfasser und Sub-Rubrik",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "allValue": "",
+        "current": {
+          "selected": false,
+          "text": "24/7 homecare services GmbH in Liquidation",
+          "value": "24/7 homecare services GmbH in Liquidation"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "P951FEA4DE68E13C5"
+        },
+        "definition": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> keep(columns: [\"displayName\"])\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r.displayName, t: \"\\\"\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r._value, t: \"\\\"\", u: \"\")  // Remove commas\r\n  }))\r\n  |> distinct()",
+        "hide": 0,
+        "includeAll": false,
+        "multi": true,
+        "name": "displayName",
+        "options": [],
+        "query": {
+          "maxDataPoints": 1000,
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> keep(columns: [\"displayName\"])\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r.displayName, t: \"\\\"\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r._value, t: \"\\\"\", u: \"\")  // Remove commas\r\n  }))\r\n  |> distinct()",
+          "refId": "InfluxVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "AB01",
+          "value": "AB01"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "P951FEA4DE68E13C5"
+        },
+        "definition": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> keep(columns: [\"subRubric\"])\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r.subRubric, t: \"\\\"\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r._value, t: \"\\\"\", u: \"\")  // Remove commas\r\n  }))\r\n  |> distinct()",
+        "hide": 0,
+        "includeAll": false,
+        "multi": true,
+        "name": "subRubric",
+        "options": [],
+        "query": {
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> keep(columns: [\"subRubric\"])\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r.subRubric, t: \"\\\"\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> map(fn: (r) => ({\r\n      _value: strings.replaceAll(v: r._value, t: \"\\\"\", u: \"\")  // Remove commas\r\n  }))\r\n  |> distinct()"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Dasboard with double filter",
+  "uid": "ddxrspjgfh4hsd",
+  "version": 7,
+  "weekStart": ""
+}

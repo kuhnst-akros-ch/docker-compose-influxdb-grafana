@@ -477,7 +477,7 @@
             "type": "influxdb",
             "uid": "P951FEA4DE68E13C5"
           },
-          "query": "from(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      combinedLabel: r.displayName + \" - \" + r.subRubric\r\n  }))\r\n  |> keep(columns: [\"combinedLabel\", \"_time\", \"_value\"]) \r\n  |> group(columns: [\"combinedLabel\"])\r\n  |> aggregateWindow(every: 1d, fn: count, createEmpty: false)\r\n  |> yield(name: \"subRubric count per day\")\r\n",
+          "query": "import \"strings\"\r\n\r\nfrom(bucket: \"officialgazette\")\r\n  |> range(start: 2024-08-01, stop: 2024-08-31)\r\n  |> filter(fn: (r) => r._measurement == \"publication\")\r\n  |> filter(fn: (r) => r.cantons == \"\\\"ZH\\\"\")\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      displayName: strings.replaceAll(v: r.displayName, t: \"\\\"\", u: \"\"),  // Remove double quotes\r\n      subRubric: strings.replaceAll(v: r.subRubric, t: \"\\\"\", u: \"\")  // Remove double quotes\r\n  }))\r\n  |> map(fn: (r) => ({\r\n      r with \r\n      combinedLabel: r.displayName + \" - \" + r.subRubric\r\n  }))\r\n  |> keep(columns: [\"combinedLabel\", \"_time\", \"_value\"]) \r\n  |> group(columns: [\"combinedLabel\"])\r\n  |> aggregateWindow(every: 1d, fn: count, createEmpty: false)\r\n  |> yield(name: \"subRubric count per day\")",
           "refId": "A"
         }
       ],
@@ -589,6 +589,6 @@
   "timezone": "browser",
   "title": "Meldungen Kanton ZH",
   "uid": "fdxlmkr8arrwgd",
-  "version": 96,
+  "version": 97,
   "weekStart": ""
 }
