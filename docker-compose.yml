@@ -1,10 +1,9 @@
 version: '2'
-name: docker-compose-influxdb-grafana_2
 services:
   influxdb:
     image: influxdb:latest
     ports:
-      - 8087:8086
+      - 8086:8086
     environment:
       DOCKER_INFLUXDB_INIT_MODE: setup
       DOCKER_INFLUXDB_INIT_USERNAME_FILE: /run/secrets/influxdb2-admin-username
@@ -18,17 +17,17 @@ services:
       - influxdb2-admin-token
     volumes:
       - type: volume
-        source: influxdb2-data_2
+        source: influxdb2-data
         target: /var/lib/influxdb2
       - type: volume
-        source: influxdb2-config_2
+        source: influxdb2-config
         target: /etc/influxdb2
   chronograf:
     image: chronograf:latest
     ports:
-      - 127.0.0.1:8889:8888
+      - 127.0.0.1:8888:8888
     volumes:
-      - chronograf-storage_2:/var/lib/chronograf
+      - chronograf-storage:/var/lib/chronograf
     depends_on:
       - influxdb
     environment:
@@ -40,9 +39,9 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - 3001:3000
+      - 3000:3000
     volumes:
-      - grafana-storage_2:/var/lib/grafana
+      - grafana-storage:/var/lib/grafana
       - ./grafana-provisioning/:/etc/grafana/provisioning
     depends_on:
       - influxdb
@@ -57,7 +56,7 @@ secrets:
   influxdb2-admin-token:
     file: .env.influxdb2-admin-token
 volumes:
-  influxdb2-data_2:
-  influxdb2-config_2:
-  chronograf-storage_2:
-  grafana-storage_2:
+  influxdb2-data:
+  influxdb2-config:
+  chronograf-storage:
+  grafana-storage:
