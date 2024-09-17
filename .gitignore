@@ -5,3 +5,4 @@ scripts/current_portal/split-ids
 *.iml
 /scripts/current_portal/ids_old
 scripts/current_portal/publications_processed
+scripts/influxdb/lines
